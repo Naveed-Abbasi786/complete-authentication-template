@@ -2,6 +2,7 @@ import { User } from "../models/auth.model.js";
 import { ApiError } from "../utlis/apiError.js";
 import { ApiResponse } from "../utlis/apiResponse.js";
 import asyncHandler from "../utlis/asyncHandler.js";
+import {uploadOnCloudinary} from '../utlis/fileUpload.js'
 import { sendResetPasswordEmail, sendVerificationCode, wellcomeEmail } from "../libs/mailsender.lib.js";
 import { generateAccessTokenAndRefreshToken } from "../utlis/generateAccesRefreshToken.js";
 import jwt from 'jsonwebtoken'
@@ -19,6 +20,21 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Email is not valid");
   }
 
+  const avatarLocalPath = req.file.path;
+
+  if (!avatarLocalPath) {
+    throw new ApiError(400, "avatar is required");
+  }
+
+  const avatarUploadCloudniary = await uploadOnCloudinary(
+    avatarLocalPath
+  );
+
+  if (!avatarUploadCloudniary) {
+    throw new ApiError(501, "avatar uploading error");
+  }
+
+
   const existedUser = await User.findOne({ email });
   if (existedUser) {
     throw new ApiError(408, "User already exists");
@@ -33,6 +49,7 @@ const registerUser = asyncHandler(async (req, res) => {
     fullName,
     email,
     password,
+    avatar:avatarUploadCloudniary.url,
     verificationCode: verificationCode,
     verificationCodeExpires: expiry,
   });
@@ -51,6 +68,8 @@ const registerUser = asyncHandler(async (req, res) => {
       )
     );
 });
+
+
 
 const verifyUser = asyncHandler(async (req, res) => {
   const { code } = req.body;
@@ -269,7 +288,7 @@ const forgetPassword = asyncHandler(async (req, res) => {
 
 
 const resetPassword = asyncHandler(async (req, res) => {
-  const { token } = req.query;
+  const token = decodeURIComponent(req.query.token);
   const { newPassword, confirmPassword } = req.body;
 
   if (!newPassword || !confirmPassword) {
@@ -298,10 +317,9 @@ const resetPassword = asyncHandler(async (req, res) => {
   user.password = hashedPassword;
   await user.save();
 
-
-
-  res.status(200).json(new ApiResponse(200,user,"Password reset successfully"));
+  res.status(200).json(new ApiResponse(200, user, "Password reset successfully"));
 });
+
 
 
 
