@@ -48,7 +48,7 @@ A robust and secure Node.js authentication system with email verification, passw
 ## Postman Testing
 
 You can test all endpoints using our Postman collection:
-[Postman Collection Link](https://.postman.co/workspace/My-Workspace~6cac3378-2854-4d85-8c18-982982f90e73/collection/34254597-8f0e4ea5-891f-4763-9407-2e68cce38f9a?action=share&creator=34254597)
+[Postman Collection Link](https://.postman.co/workspace/My-Workspace~6cac3378-2854-4d85-8c18-982982f90e73/collection/34254597-3ee2c705-7794-4f4d-8117-0c9dafd0cade?action=share&creator=34254597)
 
 ## Installation
 
